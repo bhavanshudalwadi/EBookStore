@@ -1,0 +1,80 @@
+:root {
+  font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+}
+
+.title{
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding-bottom: 50px;
+}
+
+.main{
+  padding: 50px 0;
+}
+
+label{
+  margin-bottom: 15px;
+}
+
+.link {
+  text-decoration: none;
+  color: #2d2d2d;
+}
+
+.link:hover {
+  /* text-decoration: underline;
+  text-decoration-thickness: 2px; */
+  border-bottom: 2px solid #000;
+}
+
+input[type=file]::file-selector-button {
+  content: 'Upload'!important;
+  border: 0px;
+  padding: 5px 5px 10px 5px;
+  margin-right: 10px;
+  background-color: tomato;
+  color: white;
+}
+
+.book-title {
+  height: 22px;
+  display: -webkit-box;
+  overflow: hidden;
+  font-size: 22px;
+  font-weight: 700;
+  line-height: 1;
+  margin-bottom: 2px;
+  text-overflow: ellipsis;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 1;
+  color: #414141;
+}
+
+.book-description {
+  display: -webkit-box;
+  overflow: hidden;
+  font-size: 16px;
+  text-overflow: ellipsis;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+.price {
+  color: #838383;
+  display: block;
+  font-weight: 400;
+}
