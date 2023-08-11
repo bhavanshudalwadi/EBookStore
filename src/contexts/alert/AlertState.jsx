@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import alertContext from "./alertContext";
 
 const AlertState = ({ children }) => {
-    const [showAlert, setShowAlert] = useState("Login Failed :(");
+    const [showAlert, setShowAlert] = useState("");
     const [showProgress, setShowProgress] = useState(false);
     const [showDialog, setShowDialog] = useState({
         message: "",

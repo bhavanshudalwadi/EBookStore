@@ -23,7 +23,7 @@ const Alert = () => {
             open={showAlert.length !== 0}
             onClose={() => setShowAlert('')}
             TransitionComponent={TransitionUp}
-            // autoHideDuration={2000}
+            autoHideDuration={2000}
             sx={{minWidth: '280px'}}
         >
             <AlertComponent onClose={() => setShowAlert('')} severity={severity} sx={{ width: '100%' }}>

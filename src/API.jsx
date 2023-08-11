@@ -21,7 +21,7 @@ export function createUser(data) {
 }
 
 export function fetchUsers(pgIndex, pgSize, search) {
-    if(search !== '') {
+    if(search.trim() !== '') {
         return axiosInstance.get(`user?pageIndex=${pgIndex}&pageSize=${pgSize}&keyword=${search}`);
     }
     return axiosInstance.get(`user?pageIndex=${pgIndex}&pageSize=${pgSize}`);
@@ -40,8 +40,12 @@ export function deleteUser(id) {
 }
 
 // Categories
+export function fetchAllCategories() {
+    return axiosInstance.get(`category/all`);
+}
+
 export function fetchCategories(pgIndex, pgSize, search) {
-    if(search !== '') {
+    if(search.trim() !== '') {
         return axiosInstance.get(`category?pageIndex=${pgIndex}&pageSize=${pgSize}&keyword=${search}`);
     }
     return axiosInstance.get(`category?pageIndex=${pgIndex}&pageSize=${pgSize}`);
@@ -63,43 +67,26 @@ export function deleteCategory(id) {
     return axiosInstance.delete(`category?id=${id}`);
 }
 
-
-export function saveInquiry(data) {
-    return axiosInstance.post("Inquiry-Entry.php", data);
+// Books
+export function fetchBooks(pgIndex, pgSize, search) {
+    if(search.trim() !== '') {
+        return axiosInstance.get(`book?pageIndex=${pgIndex}&pageSize=${pgSize}&keyword=${search}`);
+    }
+    return axiosInstance.get(`book?pageIndex=${pgIndex}&pageSize=${pgSize}`);
 }
 
-export function InquiryList(data) {
-    return axiosInstance.post("Inquiry-List.php", data);
+export function getSingleBook(id) {
+    return axiosInstance.get(`book/byId?id=${id}`);
 }
 
-export function LoadInquiryInfo(data) {
-    return axiosInstance.post("LoadInquiryInfo.php", data);
+export function addBook(data) {
+    return axiosInstance.post(`book`, data);
 }
 
-export function LoadBrands(data) {
-    return axiosInstance.post("LoadBrands.php", data);
+export function updateBook(data) {
+    return axiosInstance.put(`book`, data);
 }
 
-export function LoadModels(data) {
-    return axiosInstance.post("LoadModels.php", data);
-}
-
-export function LoadProbs(data) {
-    return axiosInstance.post("LoadProbs.php", data);
-}
-
-export function LoadAppCostTimeType(data) {
-    return axiosInstance.post("LoadAppCostTimeType.php", data);
-}
-
-export function checkLogin(data) {
-    return axiosInstance.post("Login.php", data);
-}
-
-export function getLocation(data) {
-    return axiosInstance.post("Location.php", data);
-}
-
-export function fetchServices(data) {
-    return axiosInstance.post("services.php", data);
+export function deleteBook(id) {
+    return axiosInstance.delete(`book?id=${id}`);
 }

@@ -17,31 +17,26 @@ import userContext from '../contexts/user/userContext';
 import { TextField } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import alertContext from '../contexts/alert/alertContext';
+import bookContext from '../contexts/book/bookContext';
 
 const headCells = [
   {
-    id: 'firstName',
+    id: 'name',
     numeric: false,
     disablePadding: true,
-    label: 'First Name',
+    label: 'Book Name',
   },
   {
-    id: 'lastName',
+    id: 'price',
     numeric: false,
     disablePadding: false,
-    label: 'Last Name',
+    label: 'Price',
   },
   {
-    id: 'email',
+    id: 'category',
     numeric: false,
     disablePadding: false,
-    label: 'Email',
-  },
-  {
-    id: 'role',
-    numeric: false,
-    disablePadding: false,
-    label: 'Role',
+    label: 'Category',
   },
   {
     id: 'action',
@@ -77,10 +72,9 @@ function stableSort(array, comparator) {
         return a[1] - b[1];
     });
     return stabilizedThis.map((el) => el[0]);
-}
-  
+} 
 
-export default function Users() {
+export default function Books() {
   const [order, setOrder] = React.useState('asc');
   const [orderBy, setOrderBy] = React.useState('');
   const [page, setPageNo] = React.useState(0);
@@ -92,6 +86,7 @@ export default function Users() {
 
   const {setPage} = useContext(headerContext);
   const {user, users, userItems, setUserItems, searchUser, deleteUserInfo} = useContext(userContext);
+  const {books, setBooks, bookDetails, getBooks, deleteBookInfo} = useContext(bookContext);
   const {showDialog, setShowDialog, isOk, setIsOk} = useContext(alertContext);
 
   function EnhancedTableHead(props) {
@@ -152,7 +147,7 @@ export default function Users() {
     console.log(newPage, maxPage);
     if(newPage+1 > maxPage) {
         setMaxPage(newPage+1);
-        searchUser(newPage+1, rowsPerPage, searchParam);
+        getBooks(newPage+1, rowsPerPage, searchParam);
     }
   };
 
@@ -164,12 +159,12 @@ export default function Users() {
     setPage("");
     setPageNo(0);
     setMaxPage(0);
-    setUserItems([]);
-    searchUser(1, 5, '');
+    setBooks([]);
+    getBooks(1, 5, '');
   },[])
   
   const emptyRows =
-    page > 0 ? Math.max(0, (1 + page) * rowsPerPage - users.totalItems) : 0;
+    page > 0 ? Math.max(0, (1 + page) * rowsPerPage - bookDetails.totalItems) : 0;
 
   const handleSearch = (e) => {
     setSearchParam(e.target.value);
@@ -179,15 +174,15 @@ export default function Users() {
     const timer = setTimeout(() => {
       setPageNo(0);
       setMaxPage(0);
-      setUserItems([]);
-      searchUser(1, rowsPerPage, searchParam)
+      setBooks([]);
+      getBooks(1, rowsPerPage, searchParam)
     }, 500);
     return () => clearTimeout(timer);
   },[searchParam, rowsPerPage])
 
   const handleDelete = (name, id) => {
     setShowDialog({
-      message: `User called '${name}'`,
+      message: `Book called '${name}'`,
       id: id
     });
   }
@@ -195,7 +190,7 @@ export default function Users() {
   useEffect(() => {
     if(isOk) {
       console.log("isOk", true);
-      deleteUserInfo(showDialog.id, rowsPerPage, searchParam);
+      deleteBookInfo(showDialog.id, rowsPerPage, searchParam);
       setIsOk(false);
       setShowDialog({
         message: '',
@@ -210,13 +205,20 @@ export default function Users() {
   return (
     <div className='main'>
       <div className="title">
-          <h2 style={{display: 'inline-block', textAlign: 'center', borderBottom: '3px solid tomato', paddingBottom: 25}}>Users</h2>
+          <h2 style={{display: 'inline-block', textAlign: 'center', borderBottom: '3px solid tomato', paddingBottom: 25}}>Books</h2>
       </div>
       <div className="container">
         <div className="row">
             <div className="col-md-1"></div>
             <div className="col-md-10">
-                <TextField variant='outlined' className='mb-4' sx={{width: 300}} onChange={(e) => handleSearch(e)} placeholder='Search User' size='small'/>
+              <div className="row">
+                <div className="col-md-6">
+                  <TextField variant='outlined' className='mb-4' sx={{width: 300}} onChange={(e) => handleSearch(e)} placeholder='Search Book' size='small'/>
+                </div>
+                <div className="col-md-6 text-end md:text-center">
+                  <Button sx={{bgcolor: '#f14d54', width: 150}} onClick={() => navigate('/add-book')} color='error' variant="contained">Add Book</Button>
+                </div>
+              </div>
                 <Box sx={{ width: '100%' }}>
                 <Paper sx={{ width: '100%', mb: 2 }}>
                     <TableContainer>
@@ -228,10 +230,10 @@ export default function Users() {
                             order={order}
                             orderBy={orderBy}
                             onRequestSort={handleRequestSort}
-                            rowCount={users.totalItems}
+                            rowCount={bookDetails.totalItems}
                         />
                         <TableBody>
-                        {userItems && stableSort(userItems, getComparator(order, orderBy))
+                        {books && stableSort(books, getComparator(order, orderBy))
                             .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                             .map((row, index) => {
                             return (
@@ -240,15 +242,12 @@ export default function Users() {
                                     tabIndex={-1}
                                     key={row.id}
                                 >
-                                    <TableCell>{row.firstName}</TableCell>
-                                    <TableCell>{row.lastName}</TableCell>
-                                    <TableCell>{row.email}</TableCell>
-                                    <TableCell>{row.role}</TableCell>
+                                    <TableCell>{row.name}</TableCell>
+                                    <TableCell>{row.price}</TableCell>
+                                    <TableCell>{row.category}</TableCell>
                                     <TableCell align='right'>
-                                        <Button variant="outlined" color='success' sx={{textTransform: 'none'}} onClick={() => navigate(`/edit-user/${row.id}`)} size='small'>Edit</Button>
-                                        {user.id != row.id && 
-                                          <Button variant="outlined" color='error' size='small' sx={{ml: 2, textTransform: 'none'}} onClick={() => handleDelete(row.firstName, row.id)}>Delete</Button>
-                                        }
+                                      <Button variant="outlined" color='success' sx={{textTransform: 'none'}} onClick={() => navigate(`/edit-book/${row.id}`)} size='small'>Edit</Button>
+                                      <Button variant="outlined" color='error' size='small' sx={{ml: 2, textTransform: 'none'}} onClick={() => handleDelete(row.name, row.id)}>Delete</Button>
                                     </TableCell>
                                 </TableRow>
                             );
@@ -268,7 +267,7 @@ export default function Users() {
                     <TablePagination
                         rowsPerPageOptions={[5, 10, 25]}
                         component="div"
-                        count={users.totalItems}
+                        count={bookDetails.totalItems}
                         rowsPerPage={rowsPerPage}
                         page={page}
                         onPageChange={handleChangePage}

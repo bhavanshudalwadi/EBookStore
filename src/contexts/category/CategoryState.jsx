@@ -1,18 +1,33 @@
-import React, { useState } from "react";
-import { fetchCategories, getSingleCategory, addCategory, updateCategory, deleteCategory } from '../../API'
+import React, { useContext, useState } from "react";
+import { fetchCategories, getSingleCategory, addCategory, updateCategory, deleteCategory, fetchAllCategories } from '../../API'
 import categoryContext from "./categoryContext";
+import { useNavigate } from "react-router-dom";
+import alertContext from "../alert/alertContext";
 
-const UserState = ({ children }) => {
+const CategoryState = ({ children }) => {
     const [singleCategory, setSinglecategory] = useState({});
+    const [categoryDetails, setCategoryDetails] = useState({});
+    const [categories, setCategories] = useState([]);
 
-    const [categories, setCategories] = useState({
-        pageIndex: 1,
-        pageSize: 5,
-        totalItems: 5,
-        totalPages: 1
-    });
+    const { setShowAlert, setShowProgress } = useContext(alertContext);
+    const navigate = useNavigate();
 
-    const [categoryItems, setCategoryItems] = useState([]);
+    const getAllCategories = async() => {
+        setShowProgress(true);
+        fetchAllCategories()
+            .then(res => {
+                if(res.data.key === "SUCCESS") {
+                    setCategories(res.data.result);
+                }else{
+                    console.log(res.data);
+                }
+                setShowProgress(false);
+            })
+            .catch(error => {
+                console.log(error);
+                setShowProgress(false);
+            })
+    }
 
     const getCategories = async(pgIndex, pgSize) => {
         fetchCategories(pgIndex, pgSize, '')
@@ -102,10 +117,10 @@ const UserState = ({ children }) => {
     }
 
     return (
-        <categoryContext.Provider value={{user, users, userItems, setUser, getUsers, searchUser, setUserItems, singleUser, setSingleUser, getUserById, updateUserInfo, deleteUserInfo}}>
+        <categoryContext.Provider value={{categories, setCategories, categoryDetails, setCategoryDetails, getAllCategories}}>
             { children }
         </categoryContext.Provider>
     );
 }
 
-export default UserState;
+export default CategoryState;

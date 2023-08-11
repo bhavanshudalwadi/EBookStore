@@ -42,12 +42,13 @@ label{
 }
 
 input[type=file]::file-selector-button {
-  content: 'Upload'!important;
+  content: 'Upload' !important;
   border: 0px;
-  padding: 5px 5px 10px 5px;
+  padding: 8px;
   margin-right: 10px;
-  background-color: tomato;
+  background-color: #f14d54;
   color: white;
+  border-radius: 4px 0px 0px 4px;
 }
 
 .book-title {
