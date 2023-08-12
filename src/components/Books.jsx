@@ -189,9 +189,8 @@ export default function Books() {
 
   useEffect(() => {
     if(isOk) {
-      console.log("isOk", true);
-      deleteBookInfo(showDialog.id, rowsPerPage, searchParam);
       setIsOk(false);
+      deleteBookInfo(showDialog.id, rowsPerPage, searchParam);
       setShowDialog({
         message: '',
         id: -1
@@ -199,7 +198,6 @@ export default function Books() {
       setPageNo(0);
       setMaxPage(0);
     }
-    console.log("isOk", false);
   },[isOk]);
 
   return (

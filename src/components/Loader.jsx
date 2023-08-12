@@ -10,7 +10,7 @@ const Loader = () => {
             sx={{zIndex: (theme) => theme.zIndex.drawer + 1 }}
             open={showProgress}
         >
-            <img src='l.gif' alt='loading...' style={{width: 120, height: 120}}/>
+            <img src='/l.gif' alt='loading...' style={{width: 120, height: 120}}/>
         </Backdrop>
     )
 }

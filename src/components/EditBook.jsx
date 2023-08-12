@@ -25,7 +25,7 @@ const EditBook = ({action}) => {
     const {setShowAlert} = useContext(alertContext);
     const {categories, getAllCategories} = useContext(categoryContext);
     const { singleUser , setSingleUser, getUserById, updateUserInfo } = useContext(userContext);
-    const { singleBook, getBookById, updateBookInfo, createBook } = useContext(bookContext);
+    const { singleBook, setSingleBook, getBookById, updateBookInfo, createBook } = useContext(bookContext);
     const params = useParams();
 
     useEffect(() => {
@@ -34,62 +34,63 @@ const EditBook = ({action}) => {
         if(params.id) {
             getBookById(params.id);
         }
+        return (() => { setSingleBook({}); setInitialValues({}); })
     },[])
 
     useEffect(() => {
         delete singleBook._id;
         delete singleBook.__v;
+        delete singleBook.category;
         setInitialValues(singleBook)
     }, [singleBook])
 
     const handleSubmit = (values) => {
         console.log(values);
-        // if(params.id) {
-        //     updateBookInfo(values);
-        // }else {
-        //     createBook(values);
-        // }
+        if(params.id) {
+            updateBookInfo(values);
+        }else {
+            createBook(values);
+        }
     }
 
-    const handleFileUpload = (e) => {
+    const handleFileUpload = (e, setFieldValue, setFieldError) => {
         if(e.target.files.length > 0) {
-            console.log(e.target.files[0])
             let ext = e.target.files[0].name.split('.')[1];
-            console.log(ext)
             let size = e.target.files[0].size / 1024;
-            if(size < 50){
+            if(size < 10){
                 if(ext === 'jpg' || ext === 'jpeg' || ext === 'png'){
                     let reader = new FileReader();
                     reader.readAsDataURL(e.target.files[0]);
                     reader.onload = function () {
-                        console.log(reader.result);
-                        setInitialValues({...initialValues, base64image: reader.result})
-                        console.log({...initialValues, base64image: reader.result});
+                        setFieldValue('base64image', reader.result);
                     };
                     reader.onerror = function (error) {
                         console.log('Error: ', error);
+                        setFieldValue('base64image', '');
                         setShowAlert("Image Coversion Failed. Try Again");
                     };
                 }else {
+                    setFieldValue('base64image', '');
                     setShowAlert("Only .jpg, .jpeg or .png files are allowed");
                 }
             }else {
-                setShowAlert("File size must be less than 50kb");
+                setFieldValue('base64image', '');
+                setShowAlert("File size must be less than 10kb");
             }
         }
     }
 
     const validate = Yup.object().shape({
-        // name: Yup.string()
-        //     .min(2, "Too Short!")
-        //     .max(50, "Too Long!")
-        //     .required("Book Name is Required"),
-        // description: Yup.string().required("Book Name is Required"),
-        // price: Yup.number()
-        //     .min(0, "Price Can't Be Less Than Zero")
-        //     .required("Book Price is Required"),
-        // categoryId: Yup.number().required("Category is Required"),
-        // base64image: Yup.string().required("Book Image is Required")
+        name: Yup.string()
+            .min(2, "Too Short!")
+            .max(50, "Too Long!")
+            .required("Book Name is Required"),
+        description: Yup.string().required("Book Name is Required"),
+        price: Yup.number()
+            .min(0, "Price Can't Be Less Than Zero")
+            .required("Book Price is Required"),
+        categoryId: Yup.number().required("Category is Required"),
+        base64image: Yup.string().required("Book Image is Required")
     });
 
     return (
@@ -112,6 +113,8 @@ const EditBook = ({action}) => {
                     handleBlur,
                     handleSubmit,
                     isSubmitting,
+                    setFieldValue,
+                    setFieldError
                 }) => (
                     <form onSubmit={handleSubmit}>
                         <div className="row">
@@ -121,7 +124,7 @@ const EditBook = ({action}) => {
                             </div>
                             <div className="col-md-6">
                                 <label className='d-block' htmlFor="price">Book Price (Rs) *</label>
-                                <TextField id='price' name='price' onChange={handleChange} onBlur={handleBlur} value={values.price} error={errors.price && touched.price} helperText={errors.price && touched.price?errors.price:''} fullWidth variant='outlined' size='small'/>        
+                                <TextField id='price' name='price' type='number' onChange={handleChange} onBlur={handleBlur} value={values.price} error={errors.price && touched.price} helperText={errors.price && touched.price?errors.price:''} fullWidth variant='outlined' size='small'/>        
                             </div>
                         </div>
                         <div className="row">
@@ -149,7 +152,7 @@ const EditBook = ({action}) => {
                                 {values.base64image ? 
                                 <>
                                     <img src={values.base64image} style={{height: 'auto', width: 'auto', maxHeight: 100, marginTop: 16}} />
-                                    <IconButton aria-label="delete" size="large" onClick={() => setInitialValues({...initialValues, base64image: ""})}>
+                                    <IconButton aria-label="delete" size="large" onClick={() => setFieldValue('base64image', '')}>
                                         <CancelRoundedIcon fontSize="inherit" />
                                     </IconButton>
                                 </>
@@ -164,7 +167,7 @@ const EditBook = ({action}) => {
                                         variant='outlined'
                                         id='base64image'
                                         name='base64image'
-                                        onChange={handleFileUpload}
+                                        onChange={(e) => handleFileUpload(e, setFieldValue, setFieldError)}
                                         error={errors.base64image && touched.base64image}
                                         helperText={errors.base64image && touched.base64image?errors.base64image:''}
                                     />

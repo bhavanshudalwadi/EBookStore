@@ -123,8 +123,28 @@ const BookState = ({children}) => {
             });
     }
 
+    const deleteBookInfo = (id, perPage, searchParam) => {
+        setShowProgress(true);
+        deleteBook(id)
+            .then(res => {
+                if(res.data.key === "SUCCESS") {
+                    setShowAlert('Book Deleted Sucessfully');
+                    setBooks([]);
+                    searchBooks(1, perPage, searchParam);
+                }else{
+                    console.log(res.data);
+                    setShowAlert('Book Not Deleted');
+                }
+                setShowProgress(false);
+            }).catch(error => {
+                console.log(error);
+                setShowProgress(false);
+                setShowAlert('Book Not Deleted');
+            });
+    }
+
     return (
-        <bookContext.Provider value={{books, setBooks, singleBook, setSingleBook, bookDetails, setBookDetails, searchBooks, createBook, getBookById, getBooks, updateBookInfo}}>
+        <bookContext.Provider value={{books, setBooks, singleBook, setSingleBook, bookDetails, setBookDetails, searchBooks, createBook, getBookById, getBooks, updateBookInfo, deleteBookInfo}}>
             { children }
         </bookContext.Provider>
     );
