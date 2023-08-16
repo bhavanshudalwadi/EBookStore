@@ -22,24 +22,23 @@ const MainNavigation = () => {
 
     return (
         <Routes>
-            <Route path="/" element={<BookListing />} />
+            <Route path="/" element={user ? <BookListing /> : RedirectLogin } />
+            <Route path="/profile" element={user ? <EditProfile /> : RedirectLogin} />
+            <Route path="/cart" element={user ? <Cart /> : RedirectLogin} />
 
-            <Route path="/login" element={<Login />} />
-            <Route path="/register" element={<Register />} />
+            <Route path="/login" element={!user ? <Login /> : RedirectHome } />
+            <Route path="/register" element={!user ? <Register /> : RedirectHome} />
     
-            <Route path="/users" element={<Users />} />
-            <Route path="/edit-user/:id" element={<EditUser />} />    
+            <Route path="/users" element={user && user.roleId === 1 ? <Users /> : RedirectHome} />
+            <Route path="/edit-user/:id" element={user && user.roleId === 1 ? <EditUser /> : RedirectHome} />
 
-            <Route path="/books" element={<Books />} />
-            <Route path="/add-book" element={<EditBook />} />
-            <Route path="/edit-book/:id" element={<EditBook />} />
+            <Route path="/books" element={user && (user.roleId === 2 || user.roleId === 1) ? <Books /> : RedirectHome} />
+            <Route path="/add-book" element={user && (user.roleId === 2 || user.roleId === 1) ? <EditBook /> : RedirectHome} />
+            <Route path="/edit-book/:id" element={user && (user.roleId === 2 || user.roleId === 1) ? <EditBook /> : RedirectHome} />
 
-            <Route path="/categories" element={<Categories />} />
-            <Route path="/add-category" element={<EditCategory />} />
-            <Route path="/edit-category/:id" element={<EditCategory />} />
-
-            <Route path="/profile" element={<EditProfile />} />
-            <Route path="/cart" element={<Cart />} />
+            <Route path="/categories" element={user && user.roleId === 1 ? <Categories /> : RedirectHome} />
+            <Route path="/add-category" element={user && user.roleId === 1 ? <EditCategory /> : RedirectHome} />
+            <Route path="/edit-category/:id" element={user && user.roleId === 1 ? <EditCategory />: RedirectHome} />
             
             <Route path="*" element={<NotFound />} />
         </Routes>

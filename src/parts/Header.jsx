@@ -80,10 +80,10 @@ const Header = () => {
                                     </span>
                                 </li>:<></>
                             }
-                            {user != null ? (user.roleId === 1 || user.roleId === 2 || user.roleId === 3) &&
+                            {user != null &&
                                 <li>
                                     <Link to="/profile" className='link'>Profile</Link>
-                                </li>:<></>
+                                </li>
                             }
                             {user === null &&
                             <>
