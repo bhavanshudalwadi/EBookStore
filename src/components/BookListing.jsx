@@ -10,7 +10,7 @@ import categoryContext from '../contexts/category/categoryContext';
 const BookListing = () => {
     const {setPage} = useContext(headerContext);
     const [currentPage, setCurrentPage] = useState(1);
-    const [perPage, setPerPage] = useState(4);
+    const [perPage, setPerPage] = useState(8);
     const [sortBy, setSortBy] = useState("");
     const [search, setSearch] = useState('');
 
@@ -29,6 +29,7 @@ const BookListing = () => {
 
     const handlePerPageChange = (e) => {
         setPerPage(e.target.value);
+        setCurrentPage(1);
     }
 
     const handleSearch = (e) => {

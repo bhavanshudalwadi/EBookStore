@@ -5,7 +5,7 @@ import { useNavigate } from "react-router-dom";
 import alertContext from "../alert/alertContext";
 
 const CategoryState = ({ children }) => {
-    const [singleCategory, setSinglecategory] = useState({});
+    const [singleCategory, setSingleCategory] = useState({});
     const [categoryDetails, setCategoryDetails] = useState({});
     const [categories, setCategories] = useState([]);
 
@@ -20,104 +20,156 @@ const CategoryState = ({ children }) => {
                     setCategories(res.data.result);
                 }else{
                     console.log(res.data);
+                    setShowAlert(res.data.error?res.data.error:'Server Error');
                 }
                 setShowProgress(false);
             })
             .catch(error => {
                 console.log(error);
                 setShowProgress(false);
+                if(typeof error.response.data.error === 'string') {
+                    setShowAlert(error.response.data.error?error.response.data.error:'Server Error');
+                }else{
+                    setShowAlert(error.response.data.key?error.response.data.key:'Server Error');
+                }
             })
     }
 
-    const getCategories = async(pgIndex, pgSize) => {
-        fetchCategories(pgIndex, pgSize, '')
+    const createCategory = async(data) => {
+        setShowProgress(true);
+        addCategory(data)
             .then(res => {
                 if(res.data.key === "SUCCESS") {
-                    setCategories({
-                        pageIndex: res.data.result.pageIndex,
-                        pageSize: res.data.result.pageSize,
-                        totalItems: res.data.result.totalItems,
-                        totalPages: res.data.result.totalPages
-                    })
-                    setCategoryItems(userItems.concat(res.data.result.items));
+                    console.log("New Category Added");
+                    setShowAlert("New Category Added");
+                    navigate('/categories');
                 }else{
                     console.log(res.data);
+                    setShowAlert(res.data.error?res.data.error:'Category Not Added');
                 }
+                setShowProgress(false);
             })
             .catch(error => {
                 console.log(error);
+                setShowProgress(false);
+                if(typeof error.response.data.error === 'string') {
+                    setShowAlert(error.response.data.error?error.response.data.error:'Category Not Added');
+                }else{
+                    setShowAlert(error.response.data.key?error.response.data.key:'Category Not Added');
+                }
             })
     }
 
-    const getUserById = async(id) => {
-        getSingleUser(id)
+    const getCategoryById = async(id) => {
+        setShowProgress(true);
+        getSingleCategory(id)
             .then(res => {
                 if(res.data.key === "SUCCESS") {
-                    setSingleUser(res.data.result);
+                    setSingleCategory(res.data.result);
+                    console.log(res.data.result);
                 }else{
                     console.log(res.data);
+                    setShowAlert(res.data.error?res.data.error:'Server Error');
                 }
+                setShowProgress(false);
             })
             .catch(error => {
                 console.log(error);
+                setShowProgress(false);
+                if(typeof error.response.data.error === 'string') {
+                    setShowAlert(error.response.data.error?error.response.data.error:'Server Error');
+                }else{
+                    setShowAlert(error.response.data.key?error.response.data.key:'Server Error');
+                }
             })
     }
 
-    const searchUser = async (pgIndex, pgSize, search) => {
-        fetchUsers(pgIndex, pgSize, search)
+    const getCategories = async (pgIndex, pgSize, search) => {
+        setShowProgress(true);
+        fetchCategories(pgIndex, pgSize, search)
             .then(res => {
                 if(res.data.key === "SUCCESS") {
-                    setUsers({
+                    setCategoryDetails({
                         pageIndex: res.data.result.pageIndex,
                         pageSize: res.data.result.pageSize,
                         totalItems: res.data.result.totalItems,
                         totalPages: res.data.result.totalPages
                     })
                     if(pgIndex == 1) {
-                        setUserItems(res.data.result.items);
+                        setCategories(res.data.result.items);
                         console.log(res.data.result.items);
                     }else{
-                        setUserItems(userItems.concat(res.data.result.items));
-                        console.log(userItems.concat(res.data.result.items));
+                        setCategories(categories.concat(res.data.result.items));
+                        console.log(categories.concat(res.data.result.items));
                     }
                 }else{
                     console.log(res.data);
+                    setShowAlert(res.data.error?res.data.error:'Server Error');
                 }
+                setShowProgress(false);
             })
             .catch(error => {
                 console.log(error);
+                setShowProgress(false);
+                if(typeof error.response.data.error === 'string') {
+                    setShowAlert(error.response.data.error?error.response.data.error:'Server Error');
+                }else{
+                    setShowAlert(error.response.data.key?error.response.data.key:'Server Error');
+                }
             })
     }
 
-    const updateUserInfo = () => {
-        // remove __v and _id
-        const { _id, __v, ...restUserData } = singleUser;
-        updateUser(restUserData)
+    const updateCategoryInfo = (data) => {
+        setShowProgress(true);
+        updateCategory(data)
             .then(res => {
                 if(res.data.key === "SUCCESS") {
-                    console.log("Data Updated");
+                    console.log("Category Updated");
+                    setShowAlert('Category Updated Sucessfully');
+                    navigate('/categories');
                 }else{
                     console.log(res.data);
+                    setShowAlert(res.data.error?res.data.error:'Category Not Updated');
                 }
+                setShowProgress(false);
             })
-            .catch(error => console.log(error));
+            .catch(error => {
+                console.log(error);
+                setShowProgress(false);
+                if(typeof error.response.data.error === 'string') {
+                    setShowAlert(error.response.data.error?error.response.data.error:'Category Not Updated');
+                }else{
+                    setShowAlert(error.response.data.key?error.response.data.key:'Category Not Updated');
+                }
+            });
     }
 
-    const deleteUserInfo = (id, perPage, searchParam) => {
-        deleteUser(id)
+    const deleteCategoryInfo = (id, perPage, searchParam) => {
+        setShowProgress(true);
+        deleteCategory(id)
             .then(res => {
                 if(res.data.key === "SUCCESS") {
-                    console.log("Data Deleted");
-                    setUserItems([]);
-                    searchUser(1, perPage, searchParam);
+                    setShowAlert('Category Deleted Sucessfully');
+                    setCategories([]);
+                    getCategories(1, perPage, searchParam);
                 }else{
                     console.log(res.data);
+                    setShowAlert(res.data.error?res.data.error:'Category Not Deleted');
                 }
-            }).catch(error => console.log(error));
+                setShowProgress(false);
+            }).catch(error => {
+                console.log(error);
+                setShowProgress(false);
+                if(typeof error.response.data.error === 'string') {
+                    setShowAlert(error.response.data.error?error.response.data.error:'Category Not Deleted');
+                }else{
+                    setShowAlert(error.response.data.key?error.response.data.key:'Category Not Deleted');
+                }
+            });
     }
 
     return (
-        <categoryContext.Provider value={{categories, setCategories, categoryDetails, setCategoryDetails, getAllCategories}}>
+        <categoryContext.Provider value={{categories, setCategories, categoryDetails, setCategoryDetails, getAllCategories, singleCategory, setSingleCategory, createCategory, getCategoryById, getCategories, updateCategoryInfo, deleteCategoryInfo}}>
             { children }
         </categoryContext.Provider>
     );

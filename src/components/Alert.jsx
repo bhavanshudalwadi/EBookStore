@@ -15,7 +15,15 @@ const Alert = () => {
     const { showAlert, setShowAlert } = useContext(alertContext);
 
     const severity = useMemo(() => {
-        return showAlert.toLowerCase().includes("success")?'success':showAlert.toLowerCase().includes("fail")?'error':'';
+        let msg = showAlert.toLowerCase();
+        if(msg === '') {
+            return '';
+        }else if(msg.includes('not') || msg.includes('error') || msg.includes('exists') || msg.includes('already')) {
+            return 'error';
+        }else if(msg.includes('successfully') || msg.includes('added') || msg.includes('welcome')) {
+            return 'success';
+        }
+        return 'info';
     }, [showAlert])
     
     return (

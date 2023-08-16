@@ -23,24 +23,27 @@ const UserState = ({ children }) => {
         authUser(data)
             .then(res => {
                 if(res.data.key === "SUCCESS") {
-                    console.log("Login Successful");
                     delete res.data.result._id;
                     delete res.data.result.__v;
                     localStorage.setItem('user', JSON.stringify(res.data.result));
                     setUser(res.data.result);
-                    setShowAlert("Welcome Back "+res.data.result.firstName);
                     setShowProgress(false);
+                    setShowAlert("Welcome Back "+res.data.result.firstName);
                     navigate('/');
                 }else{
                     console.log(res.data);
-                    setShowAlert('Login Failed :(');
                     setShowProgress(false);
+                    setShowAlert(res.data.error?res.data.error:'Login Failed');
                 }
             })
             .catch(error => {
                 console.log(error);
-                setShowAlert('Login Failed :(');
                 setShowProgress(false);
+                if(typeof error.response.data.error === 'string') {
+                    setShowAlert(error.response.data.error?error.response.data.error:'Login Failed');
+                }else{
+                    setShowAlert(error.response.data.key?error.response.data.key:'Login Failed');
+                }
             })
     }
 
@@ -49,18 +52,22 @@ const UserState = ({ children }) => {
         createUser(data)
             .then(res => {
                 if(res.data.key === "SUCCESS") {
-                    console.log("Registration Successful");
                     setShowAlert("Registration Successful");
                     navigate('/login');
                 }else{
                     console.log(res.data);
-                    setShowAlert('Login Failed :(');
+                    setShowAlert(res.data.error?res.data.error:'Registration Failed');
                 }
                 setShowProgress(false);
             })
             .catch(error => {
                 console.log(error);
                 setShowProgress(false);
+                if(typeof error.response.data.error === 'string') {
+                    setShowAlert(error.response.data.error?error.response.data.error:'Registration Failed');
+                }else{
+                    setShowAlert(error.response.data.key?error.response.data.key:'Registration Failed');
+                }
             })
     }
 
@@ -72,12 +79,18 @@ const UserState = ({ children }) => {
                     setSingleUser(res.data.result);
                 }else{
                     console.log(res.data);
+                    setShowAlert(res.data.error?res.data.error:'Server Error');
                 }
                 setShowProgress(false);
             })
             .catch(error => {
                 console.log(error);
                 setShowProgress(false);
+                if(typeof error.response.data.error === 'string') {
+                    setShowAlert(error.response.data.error?error.response.data.error:'Server Error');
+                }else{
+                    setShowAlert(error.response.data.key?error.response.data.key:'Server Error');
+                }
             })
     }
 
@@ -101,34 +114,42 @@ const UserState = ({ children }) => {
                     }
                 }else{
                     console.log(res.data);
+                    setShowAlert(res.data.error?res.data.error:'Server Error');
                 }
                 setShowProgress(false);
             })
             .catch(error => {
                 console.log(error);
                 setShowProgress(false);
+                if(typeof error.response.data.error === 'string') {
+                    setShowAlert(error.response.data.error?error.response.data.error:'Server Error');
+                }else{
+                    setShowAlert(error.response.data.key?error.response.data.key:'Server Error');
+                }
             })
     }
 
-    const updateUserInfo = () => {
+    const updateUserInfo = (data, redirect) => {
         setShowProgress(true);
-        // remove __v and _id
-        const { _id, __v, ...restUserData } = singleUser;
-        updateUser(restUserData)
+        updateUser(data)
             .then(res => {
+                setShowProgress(false);
                 if(res.data.key === "SUCCESS") {
-                    console.log("Data Updated");
-                    setShowAlert('User Updated Sucessfully');
+                    setShowAlert('User Updated Successfully');
+                    navigate(redirect);
                 }else{
                     console.log(res.data);
-                    setShowAlert('User Not Updated');
+                    setShowAlert(res.data.error?res.data.error:'User Not Updated');
                 }
-                setShowProgress(false);
             })
             .catch(error => {
                 console.log(error);
                 setShowProgress(false);
-                setShowAlert('User Not Updated');
+                if(typeof error.response.data.error === 'string') {
+                    setShowAlert(error.response.data.error?error.response.data.error:'User Not Updated');
+                }else{
+                    setShowAlert(error.response.data.key?error.response.data.key:'User Not Updated');
+                }
             });
     }
 
@@ -140,16 +161,20 @@ const UserState = ({ children }) => {
                     console.log("Data Deleted");
                     setUserItems([]);
                     searchUser(1, perPage, searchParam);
-                    setShowAlert('User Deleted Sucessfully');
+                    setShowAlert('User Deleted Successfully');
                 }else{
                     console.log(res.data);
-                    setShowAlert('User Not Deleted');
+                    setShowAlert(res.data.error?res.data.error:'User Not Deleted');
                 }
                 setShowProgress(false);
             }).catch(error => {
                 console.log(error);
                 setShowProgress(false);
-                setShowAlert('User Not Deleted');
+                if(typeof error.response.data.error === 'string') {
+                    setShowAlert(error.response.data.error?error.response.data.error:'User Not Deleted');
+                }else{
+                    setShowAlert(error.response.data.key?error.response.data.key:'User Not Deleted');
+                }
             });
     }
 

@@ -1,7 +1,7 @@
 export const localBackEndURL = "https://book-e-sell-node-api.vercel.app/api/"
 
 export const apiURL = process.env.NODE_ENV === 'production' ?
-    'https://uniquetechnology.ml/Project_Backend/' : localBackEndURL
+    'https://book-e-sell-node-api.vercel.app/api/' : localBackEndURL
 
 import axios from 'axios';
 
@@ -68,6 +68,12 @@ export function deleteCategory(id) {
 }
 
 // Books
+export function globleBookSearch(search) {
+    if(search.trim() !== '') {
+        return axiosInstance.get(`book/search?keyword=${search}`);
+    }
+}
+
 export function fetchBooks(pgIndex, pgSize, search) {
     if(search.trim() !== '') {
         return axiosInstance.get(`book?pageIndex=${pgIndex}&pageSize=${pgSize}&keyword=${search}`);
@@ -89,4 +95,26 @@ export function updateBook(data) {
 
 export function deleteBook(id) {
     return axiosInstance.delete(`book?id=${id}`);
+}
+
+// Cart
+export function fetchCartItems(id) {
+    return axiosInstance.get(`cart?userId=${id}`);
+}
+
+export function addToCart(data) {
+    return axiosInstance.post(`cart`, data);
+}
+
+export function updateCart(data) {
+    return axiosInstance.put(`cart`, data);
+}
+
+export function removeCart(id) {
+    return axiosInstance.delete(`cart?id=${id}`);
+}
+
+// Place Order
+export function placeOrder(data) {
+    return axiosInstance.post(`order`, data);
 }

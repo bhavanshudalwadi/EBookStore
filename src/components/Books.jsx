@@ -85,7 +85,6 @@ export default function Books() {
   const navigate = useNavigate();
 
   const {setPage} = useContext(headerContext);
-  const {user, users, userItems, setUserItems, searchUser, deleteUserInfo} = useContext(userContext);
   const {books, setBooks, bookDetails, getBooks, deleteBookInfo} = useContext(bookContext);
   const {showDialog, setShowDialog, isOk, setIsOk} = useContext(alertContext);
 

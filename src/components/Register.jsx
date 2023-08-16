@@ -29,7 +29,7 @@ const Register = () => {
         roleId: "",
         password: "",
         confirmPassword: "",
-      };
+    };
     const validate = Yup.object().shape({
         firstName: Yup.string()
           .min(2, "Too Short!")
@@ -44,7 +44,7 @@ const Register = () => {
             .min(5, "Password must be 5 charaters at minimum")
             .required("Password must Required"),
         confirmPassword: Yup.string()
-          .oneOf([Yup.ref("password"), null], "Passwords must match")
+          .oneOf([Yup.ref("password")], "Passwords must match")
           .required("Required"),
         roleId: Yup.number().required("Role is required"),
     });

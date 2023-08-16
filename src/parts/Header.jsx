@@ -1,33 +1,23 @@
-import React, { useContext, useEffect, useState } from 'react'
+import React, { useContext, useEffect, useRef, useState } from 'react'
 import './Header.css'
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
-import SearchIcon from '@mui/icons-material/Search';
 import LogoutRoundedIcon from '@mui/icons-material/LogoutRounded';
 import Box from '@mui/material/Box';
-import { Button, TextField, Breadcrumbs, Typography, Autocomplete } from '@mui/material';
+import { Button, TextField, Breadcrumbs, Typography, Autocomplete, CircularProgress } from '@mui/material';
 import headerContext from '../contexts/header/headerContext';
 import { Link, useNavigate } from 'react-router-dom';
 import Icon from '../../public/icon.png';
 import userContext from '../contexts/user/userContext';
+import bookContext from '../contexts/book/bookContext';
+import cartContext from '../contexts/cart/cartContext';
 
 const Header = () => {
-    const { user, setUser } = useContext(userContext);
-    const [searchList, setSearchList] = useState([
-        {
-            "title": "Title 1",
-            "category": "category",
-            "price": 1000,
-            "description": "Description"
-        },
-        {
-            "title": "Title 2",
-            "category": "category",
-            "price": 500,
-            "description": "Description"
-        }
-    ]);
-    const navigateTo = useNavigate();
     const { page } = useContext(headerContext);
+    const { user, setUser } = useContext(userContext);
+    const { searchProgress, globleBooks, globleSearch } = useContext(bookContext);
+    const { cartItems, getCartItems, addItemToCart } = useContext(cartContext);
+    const searchInput = useRef();
+    const navigateTo = useNavigate();
     
     const handleLogout = (e) => {
         e.preventDefault();
@@ -35,6 +25,17 @@ const Header = () => {
         setUser(null);
         navigateTo('/login');
     }
+
+    const handleSearchChange = (e) => {
+        globleSearch(e.target.value);
+        // console.log(e.target.value);
+    }
+
+    useEffect(() => {
+        if(user) {
+            getCartItems();
+        }
+    }, [])
 
     return (
     <>
@@ -56,7 +57,7 @@ const Header = () => {
                 <div className="collapse navbar-collapse" id="navbarSupportedContent">
                     <ul className="navbar-nav me-auto mb-2 mb-lg-0"></ul>
                     <div className="d-flex" role="search">
-                        <ul className='nav-links'>
+                        <ul className='nav-links p-0'>
                             {/* {user} */}
                             {user != null ? user.roleId === 1 &&
                                 <>
@@ -97,16 +98,17 @@ const Header = () => {
                             </>}
                             <li>
                                 <Button sx={{color: 'tomato'}} color="error" variant="outlined" startIcon={<ShoppingCartIcon />}  onClick={()=>{navigateTo('/cart')}}>
-                                    <span>0</span>&nbsp;
+                                    <span>{cartItems?.length}</span>&nbsp;
                                     <span style={{color: 'black', textTransform: 'none'}}>Cart</span>
                                 </Button>
                             </li>
                             {user !== null &&
                             <li>
-                                <Button className='ms-4' color="inherit" variant="outlined" endIcon={<LogoutRoundedIcon />}  onClick={handleLogout}>
+                                <Button className='btn-logout' color="inherit" variant="outlined" endIcon={<LogoutRoundedIcon />}  onClick={handleLogout}>
                                     Logout
                                 </Button>
-                            </li>}
+                            </li>
+                            }
                         </ul>
                     </div>
                 </div>
@@ -135,28 +137,27 @@ const Header = () => {
             <Autocomplete
                 freeSolo
                 id="search"
-                disableClearable
-                className='search-input'
-                options={searchList}
-                autoHighlight
-                getOptionLabel={(option) => option.title}
+                className='search-input me-3'
+                options={globleBooks}
+                getOptionLabel={(option) => option.name}
                 renderOption={(props, option) => (
-                    <Box sx={{ display: 'flex', flexDirection: 'column', width: '100%', alignItems: 'space-between', justifyContent: 'space-between'}} component="li" {...props}>
-                        <Box sx={{display: 'flex', width: '100%', alignItems: 'space-between', justifyContent: 'space-between'}}>
-                            <h5>{option.title}</h5>
+                    <Box sx={{ display: 'flex', flexDirection: 'column', width: '100%', alignItems: 'space-between', justifyContent: 'space-between', zIndex: (theme) => theme.zIndex.drawer + 1}} component="li" {...props}>
+                        <Box className='d-flex w-100 align-items-between justify-content-between'>
+                            <h6 className='fw-bold'>{option.name}</h6>
                             <h6>{option.price}</h6>
                         </Box>
-                        <Box sx={{display: 'flex', width: '100%', alignItems: 'space-between', justifyContent: 'space-between'}}>
-                            <h5>{option.category}</h5>
-                            <Button color="error" onClick={() => alert(option.title)}>Add to cart</Button>
+                        <Box className='d-flex w-100 align-items-between justify-content-between'>
+                            <h6 className='w-75 mt-2' style={{color: '#838383', overflow: 'hidden', whiteSpace: 'nowrap', textOverflow: 'ellipsis'}}>{option.description}</h6>
+                            <Button color="error" size='small' className='w-25' onClick={() => addItemToCart(option.id, 1)}>Add to cart</Button>
                         </Box>
-                        <h5 style={{width: '100%'}}>{option.description}</h5>
                     </Box>
                 )}
                 renderInput={(params) => (
                     <TextField
                         {...params}
                         placeholder='Tell me what you want ?'
+                        inputRef={searchInput}
+                        onChange={handleSearchChange}
                         inputProps={{
                             ...params.inputProps,
                             autoComplete: 'new-password',
@@ -167,11 +168,12 @@ const Header = () => {
                 size='small'
                 style={{backgroundColor: 'white'}}
             />
+            <CircularProgress className={searchProgress?'visible':'invisible'} />
             {/* <TextField variant='outlined' size='small' style={{backgroundColor: 'white', width: 422, marginRight: 10}} placeholder='Tell me what you want ?' /> */}
-            {/* <Button sx={{marginRight: 2}} color="success" variant="contained" startIcon={<SearchIcon />} onClick={()=>{}}>
+            {/* <Button sx={{marginRight: 2}} color="success" variant="contained" onClick={() => setOpen(true)}>
                 <span style={{color: 'white', textTransform: 'none'}}>Search</span>
-            </Button>
-            <Button color="error" variant="contained" onClick={()=>{}}>
+            </Button> */}
+            {/* <Button color="error" variant="contained" onClick={()=>{}}>
                 <span style={{color: 'white', textTransform: 'none'}}>Cancel</span>
             </Button> */}
         </div>

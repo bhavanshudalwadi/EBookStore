@@ -13,35 +13,17 @@ import Paper from '@mui/material/Paper';
 import Button from '@mui/material/Button';
 import { visuallyHidden } from '@mui/utils';
 import headerContext from '../contexts/header/headerContext';
-import userContext from '../contexts/user/userContext';
 import { TextField } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import alertContext from '../contexts/alert/alertContext';
+import categoryContext from '../contexts/category/categoryContext';
 
 const headCells = [
   {
-    id: 'firstName',
+    id: 'name',
     numeric: false,
     disablePadding: true,
-    label: 'First Name',
-  },
-  {
-    id: 'lastName',
-    numeric: false,
-    disablePadding: false,
-    label: 'Last Name',
-  },
-  {
-    id: 'email',
-    numeric: false,
-    disablePadding: false,
-    label: 'Email',
-  },
-  {
-    id: 'role',
-    numeric: false,
-    disablePadding: false,
-    label: 'Role',
+    label: 'Category Name',
   },
   {
     id: 'action',
@@ -77,12 +59,11 @@ function stableSort(array, comparator) {
         return a[1] - b[1];
     });
     return stabilizedThis.map((el) => el[0]);
-}
-  
+} 
 
 export default function Categories() {
   const [order, setOrder] = React.useState('asc');
-  const [orderBy, setOrderBy] = React.useState('calories');
+  const [orderBy, setOrderBy] = React.useState('');
   const [page, setPageNo] = React.useState(0);
   const [rowsPerPage, setRowsPerPage] = React.useState(5);
   const [maxPage, setMaxPage] = React.useState(0);
@@ -91,8 +72,8 @@ export default function Categories() {
   const navigate = useNavigate();
 
   const {setPage} = useContext(headerContext);
-  const {user, users, userItems, setUserItems, searchUser, deleteUserInfo} = useContext(userContext);
-  const {showDialog, setShowDialog, isOk, setIsOk, setShowAlert} = useContext(alertContext);
+  const {categories, setCategories, categoryDetails, getCategories, deleteCategoryInfo} = useContext(categoryContext);
+  const {showDialog, setShowDialog, isOk, setIsOk} = useContext(alertContext);
 
   function EnhancedTableHead(props) {
     const { order, orderBy, onRequestSort } = props;
@@ -152,55 +133,50 @@ export default function Categories() {
     console.log(newPage, maxPage);
     if(newPage+1 > maxPage) {
         setMaxPage(newPage+1);
-        searchUser(newPage+1, rowsPerPage, searchParam);
-        console.log("page Change Called", newPage+1, rowsPerPage);
+        getCategories(newPage+1, rowsPerPage, searchParam);
     }
   };
 
   const handleChangeRowsPerPage = (event) => {
     setRowsPerPage(parseInt(event.target.value, 10));
-    setPageNo(0);
-    setMaxPage(0);
-    setUserItems([]);
-    searchUser(1, parseInt(event.target.value, 10), searchParam);
   };
-
-  useEffect(()=>{
+  
+  useEffect(() => {
     setPage("");
     setPageNo(0);
     setMaxPage(0);
-    setUserItems([]);
-    searchUser(1, 5, '');
+    setCategories([]);
+    getCategories(1, 5, '');
   },[])
-
-  // useEffect(() => {
-  //   console.log(userItems);
-  // },[userItems])
   
   const emptyRows =
-    page > 0 ? Math.max(0, (1 + page) * rowsPerPage - users.totalItems) : 0;
+    page > 0 ? Math.max(0, (1 + page) * rowsPerPage - categoryDetails.totalItems) : 0;
 
   const handleSearch = (e) => {
     setSearchParam(e.target.value);
-    setPageNo(0);
-    setMaxPage(0);
-    setUserItems([]);
-    searchUser(1, rowsPerPage, e.target.value);
   }
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setPageNo(0);
+      setMaxPage(0);
+      setCategories([]);
+      getCategories(1, rowsPerPage, searchParam)
+    }, 500);
+    return () => clearTimeout(timer);
+  },[searchParam, rowsPerPage])
 
   const handleDelete = (name, id) => {
     setShowDialog({
-      message: `User called '${name}'`,
+      message: `Category called '${name}'`,
       id: id
     });
   }
 
   useEffect(() => {
     if(isOk) {
-      console.log("isOk", true);
-      deleteUserInfo(showDialog.id, rowsPerPage, searchParam);
-      setShowAlert("Category Deleted Successful");
       setIsOk(false);
+      deleteCategoryInfo(showDialog.id, rowsPerPage, searchParam);
       setShowDialog({
         message: '',
         id: -1
@@ -208,19 +184,25 @@ export default function Categories() {
       setPageNo(0);
       setMaxPage(0);
     }
-    console.log("isOk", false);
   },[isOk]);
 
   return (
     <div className='main'>
       <div className="title">
-          <h2 style={{display: 'inline-block', textAlign: 'center', borderBottom: '3px solid tomato', paddingBottom: 25}}>Users</h2>
+          <h2 style={{display: 'inline-block', textAlign: 'center', borderBottom: '3px solid tomato', paddingBottom: 25}}>Categories</h2>
       </div>
       <div className="container">
         <div className="row">
             <div className="col-md-1"></div>
             <div className="col-md-10">
-                <TextField variant='outlined' className='mb-4' onChange={(e) => handleSearch(e)} placeholder='Search User' size='small'/>
+              <div className="row">
+                <div className="col-md-6">
+                  <TextField variant='outlined' className='mb-4' sx={{width: 300}} onChange={handleSearch} placeholder='Search Category' size='small'/>
+                </div>
+                <div className="col-md-6 text-end md:text-center">
+                  <Button sx={{bgcolor: '#f14d54', width: 150}} onClick={() => navigate('/add-category')} color='error' variant="contained">Add Category</Button>
+                </div>
+              </div>
                 <Box sx={{ width: '100%' }}>
                 <Paper sx={{ width: '100%', mb: 2 }}>
                     <TableContainer>
@@ -232,10 +214,10 @@ export default function Categories() {
                             order={order}
                             orderBy={orderBy}
                             onRequestSort={handleRequestSort}
-                            rowCount={users.totalItems}
+                            rowCount={categoryDetails.totalItems}
                         />
                         <TableBody>
-                        {userItems && stableSort(userItems, getComparator(order, orderBy))
+                        {categories && stableSort(categories, getComparator(order, orderBy))
                             .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                             .map((row, index) => {
                             return (
@@ -244,15 +226,10 @@ export default function Categories() {
                                     tabIndex={-1}
                                     key={row.id}
                                 >
-                                    <TableCell>{row.firstName}</TableCell>
-                                    <TableCell>{row.lastName}</TableCell>
-                                    <TableCell>{row.email}</TableCell>
-                                    <TableCell>{row.role}</TableCell>
+                                    <TableCell>{row.name}</TableCell>
                                     <TableCell align='right'>
-                                        {user.id != row.id && 
-                                          <Button variant="outlined" color='success' sx={{mr: 2, textTransform: 'none'}} onClick={() => navigate(`/edit-user/${row.id}`)} size='small'>Edit</Button>
-                                        }
-                                        <Button variant="outlined" color='error' size='small' sx={{textTransform: 'none'}} onClick={() => handleDelete(row.firstName, row.id)}>Delete</Button>
+                                      <Button variant="outlined" color='success' sx={{textTransform: 'none'}} onClick={() => navigate(`/edit-category/${row.id}`)} size='small'>Edit</Button>
+                                      <Button variant="outlined" color='error' size='small' sx={{ml: 2, textTransform: 'none'}} onClick={() => handleDelete(row.name, row.id)}>Delete</Button>
                                     </TableCell>
                                 </TableRow>
                             );
@@ -272,7 +249,7 @@ export default function Categories() {
                     <TablePagination
                         rowsPerPageOptions={[5, 10, 25]}
                         component="div"
-                        count={users.totalItems}
+                        count={categoryDetails.totalItems}
                         rowsPerPage={rowsPerPage}
                         page={page}
                         onPageChange={handleChangePage}

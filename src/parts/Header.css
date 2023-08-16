@@ -54,8 +54,15 @@
     width: 40%;
 }
 
+.btn-logout {
+    margin-left: 2rem !important;
+}
+
 @media screen and (max-width: 900px) {
     .search-input {
         width: 90%;
-    }        
+    }
+    .btn-logout {
+        margin-left: 6rem !important;
+    }
 }

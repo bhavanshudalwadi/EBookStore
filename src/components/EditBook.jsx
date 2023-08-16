@@ -10,7 +10,7 @@ import * as Yup from "yup";
 import bookContext from '../contexts/book/bookContext';
 import CancelRoundedIcon from '@mui/icons-material/CancelRounded';
 
-const EditBook = ({action}) => {
+const EditBook = () => {
     const navigate = useNavigate();
 
     const [initialValues, setInitialValues] = useState({
@@ -96,7 +96,7 @@ const EditBook = ({action}) => {
     return (
         <div className='main'>
             <div className="title">
-                <h2 style={{display: 'inline-block', textAlign: 'center', borderBottom: '3px solid tomato', paddingBottom: 25}}>{action}</h2>
+                <h2 style={{display: 'inline-block', textAlign: 'center', borderBottom: '3px solid tomato', paddingBottom: 25}}>{params.id?"Edit Book":"Add Book"}</h2>
             </div>
             <div className="container">
             <Formik
@@ -126,8 +126,6 @@ const EditBook = ({action}) => {
                                 <label className='d-block' htmlFor="price">Book Price (Rs) *</label>
                                 <TextField id='price' name='price' type='number' onChange={handleChange} onBlur={handleBlur} value={values.price} error={errors.price && touched.price} helperText={errors.price && touched.price?errors.price:''} fullWidth variant='outlined' size='small'/>        
                             </div>
-                        </div>
-                        <div className="row">
                             <div className="col-md-6">
                                 <label className='d-block mt-3' htmlFor="categoryId">Category *</label>
                                 <FormControl fullWidth>
@@ -150,12 +148,12 @@ const EditBook = ({action}) => {
                             </div>
                             <div className="col-md-6">
                                 {values.base64image ? 
-                                <>
-                                    <img src={values.base64image} style={{height: 'auto', width: 'auto', maxHeight: 100, marginTop: 16}} />
+                                <div className='h-100 d-flex align-items-end'>
+                                    <img src={values.base64image} style={{height: 'auto', width: 'auto', maxHeight: 80, borderRadius: 5}} />
                                     <IconButton aria-label="delete" size="large" onClick={() => setFieldValue('base64image', '')}>
                                         <CancelRoundedIcon fontSize="inherit" />
                                     </IconButton>
-                                </>
+                                </div>
                                 :<>
                                     <label className='d-block mt-3' htmlFor="base64image">Image *</label>
                                     <TextField
@@ -174,8 +172,6 @@ const EditBook = ({action}) => {
                                 </>
                                 }
                             </div>
-                        </div>
-                        <div className="row">
                             <div className="col-md-12">
                                 <label className='d-block mt-3' htmlFor="description">Description *</label>
                                 <TextField id='description' multiline rows={3} name='description' onChange={handleChange} onBlur={handleBlur} value={values.description} error={errors.description && touched.description} helperText={errors.description && touched.description?errors.description:''} fullWidth variant='outlined' size='small'/>
