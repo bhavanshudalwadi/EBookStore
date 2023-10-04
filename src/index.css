@@ -72,6 +72,7 @@ input[type=file]::file-selector-button {
   text-overflow: ellipsis;
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 2;
+  height: 47px;
 }
 
 .price {

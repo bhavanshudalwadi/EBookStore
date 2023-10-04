@@ -12,30 +12,34 @@ import BookState from "./contexts/book/BookState";
 import CategoryState from "./contexts/category/CategoryState";
 import CartState from "./contexts/cart/CartState";
 import MainNavigation from "./MainNavigation";
+// import customTheme from "./customTheme";
+// import { ThemeProvider } from "@mui/material";
 
 const App = () => {
   return (
     <>
-      <BrowserRouter>
-        <AlertState>
-          <UserState>
-            <CartState>
-              <HeaderState>
-                <CategoryState>
-                  <BookState>
-                    <Header />
-                    <MainNavigation />
-                    <Footer />
-                    <Alert />
-                    <AlertDialog />
-                    <Loader />
-                  </BookState>
-                </CategoryState>
-              </HeaderState>
-            </CartState>
-          </UserState>
-        </AlertState>
-      </BrowserRouter>
+      {/* <ThemeProvider theme={customTheme}> */}
+        <BrowserRouter>
+          <AlertState>
+            <UserState>
+              <CartState>
+                <HeaderState>
+                  <CategoryState>
+                    <BookState>
+                      <Header />
+                      <MainNavigation />
+                      <Footer />
+                      <Alert />
+                      <AlertDialog />
+                      <Loader />
+                    </BookState>
+                  </CategoryState>
+                </HeaderState>
+              </CartState>
+            </UserState>
+          </AlertState>
+        </BrowserRouter>
+      {/* </ThemeProvider> */}
     </>
   )
 }

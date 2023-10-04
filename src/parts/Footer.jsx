@@ -15,7 +15,7 @@ const Footer = () => {
               </div>
           </div>
         </Link>
-        <p className='mb-2'>© 2020 bhavanshudalwadi.com.</p>
+        <p className='mb-2'>© 2020 ebook-store.vercel.app</p>
         <p>All rights reserved.</p>
     </div>
   )
